@@ -1,6 +1,6 @@
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -13,6 +13,7 @@ import {
 import CustomForm from "../components/CustomForm";
 
 const MainScreen = () => {
+  const [modalItem, setModalItem] = useState("");
   const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
   const [toggleModal, setToggleModal] = useState(false);
@@ -51,14 +52,13 @@ const MainScreen = () => {
       if (exist) {
         let index = data.findIndex((item) => item.id === id);
         const newData = data;
-        newData.splice(index, 1);
-        newData[index] = {
+        newData.splice(index, 1, {
           id: id,
           title: title,
           amount: amount,
           note: note,
           date: date,
-        };
+        });
         setData(newData);
         getTotal();
         setToggleModal(false);
@@ -78,6 +78,7 @@ const MainScreen = () => {
       ];
     });
   };
+
   return (
     <View style={styles.cotainer}>
       <View style={styles.header}>
@@ -100,6 +101,8 @@ const MainScreen = () => {
                   <TouchableOpacity
                     style={styles.edit}
                     onPress={() => {
+                      console.log(item);
+                      setModalItem(item);
                       setToggleModal(true);
                     }}
                   >
@@ -109,12 +112,12 @@ const MainScreen = () => {
                     <Modal isVisible={toggleModal}>
                       <View style={styles.modal}>
                         <CustomForm
-                          curId={item.id}
+                          curId={modalItem.id}
                           onSubmit={getData}
-                          curTitle={item.title}
-                          curAmount={item.amount}
-                          curNote={item.note}
-                          curDate={item.date}
+                          curTitle={modalItem.title}
+                          curAmount={modalItem.amount}
+                          curNote={modalItem.note}
+                          curDate={modalItem.date}
                           showModal={setToggleModal}
                         />
                       </View>

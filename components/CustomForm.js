@@ -39,9 +39,13 @@ const CustomForm = ({
       setError(false);
       return;
     }
-    if (title && amount && note && date) {
+    if (title && amount && !isNaN(amount) && note && date) {
       const id = Math.random().toString();
       onSubmit(id, title, amount, note, date);
+      setTitle("");
+      setAmount("");
+      setNote("");
+      setDate(NewDate);
     }
   };
 
@@ -62,7 +66,7 @@ const CustomForm = ({
       setError(false);
       return;
     }
-    if (curId && title && amount && note && date) {
+    if (curId && title && amount && !isNaN(amount) && note && date) {
       onSubmit(curId, title, amount, note, date);
     }
   };
