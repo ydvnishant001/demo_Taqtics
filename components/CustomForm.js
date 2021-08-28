@@ -1,12 +1,23 @@
 import React, { useState } from "react";
 import { Text, View, StyleSheet, TextInput, Button } from "react-native";
 import DatePicker from "react-native-datepicker";
+import moment from "moment";
 
-const CustomForm = ({ onSubmit, initialValues }) => {
-  const [title, setTitle] = useState(initialValues.title);
-  const [amount, setAmount] = useState(initialValues.amount);
-  const [note, setNote] = useState(initialValues.note);
-  const [date, setDate] = useState(initialValues.date);
+const CustomForm = ({
+  curId,
+  onSubmit,
+  curTitle,
+  curAmount,
+  curNote,
+  curDate,
+  showModal,
+}) => {
+  const NewDate = moment().format("YYYY-MM-DD");
+  const [title, setTitle] = useState(curTitle ? curTitle : "");
+  const [amount, setAmount] = useState(curAmount ? curAmount : "");
+  const [note, setNote] = useState(curNote ? curNote : "");
+  const [date, setDate] = useState(curDate ? curDate : NewDate);
+  const [error, setError] = useState(false);
   const [errorTitle, setErrorTitle] = useState("");
   const [errorAmount, setErrorAmount] = useState("");
   const [errorNote, setErrorNote] = useState("");
@@ -14,12 +25,45 @@ const CustomForm = ({ onSubmit, initialValues }) => {
   const submit = () => {
     if (!title) {
       setErrorTitle("Required");
+      setError(true);
     }
     if (!amount || isNaN(amount)) {
       setErrorAmount("Amount must be a number");
+      setError(true);
     }
     if (!note) {
       setErrorNote("Required");
+      setError(true);
+    }
+    if (error) {
+      setError(false);
+      return;
+    }
+    if (title && amount && note && date) {
+      const id = Math.random().toString();
+      onSubmit(id, title, amount, note, date);
+    }
+  };
+
+  const update = () => {
+    if (!title) {
+      setErrorTitle("Required");
+      setError(true);
+    }
+    if (!amount || isNaN(amount)) {
+      setErrorAmount("Amount must be a number");
+      setError(true);
+    }
+    if (!note) {
+      setErrorNote("Required");
+      setError(true);
+    }
+    if (error) {
+      setError(false);
+      return;
+    }
+    if (curId && title && amount && note && date) {
+      onSubmit(curId, title, amount, note, date);
     }
   };
 
@@ -56,45 +100,44 @@ const CustomForm = ({ onSubmit, initialValues }) => {
         <Text style={{ color: "red", marginLeft: 5 }}>{errorNote}</Text>
       ) : null}
       <DatePicker
-        style={{ width: 200 }}
+        style={{
+          width: 220,
+          left: 4,
+          top: 5,
+        }}
         date={date}
         mode="date"
-        placeholder="select date"
+        placeholder="Date"
         format="YYYY-MM-DD"
-        minDate="2016-05-01"
-        maxDate="2025-06-01"
-        confirmBtnText="Confirm"
-        cancelBtnText="Cancel"
-        customStyles={{
-          dateIcon: {
-            position: "absolute",
-            left: 0,
-            top: 4,
-            marginLeft: 0,
-          },
-          dateInput: {
-            marginLeft: 36,
-          },
-          // ... You can check the source to find the other keys.
-        }}
+        showIcon={false}
         onDateChange={(date) => {
           setDate(date);
         }}
       />
-      <View style={styles.button}>
-        <Button title="Add Expense" onPress={() => submit()} />
+      <View style={styles.submit}>
+        <Button
+          title={showModal ? "Update" : "Add Expense"}
+          onPress={() => {
+            if (showModal) {
+              update();
+            } else {
+              submit();
+            }
+          }}
+        />
       </View>
+      {showModal ? (
+        <View style={styles.cancel}>
+          <Button
+            title="Cancel"
+            onPress={() => {
+              showModal(false);
+            }}
+          />
+        </View>
+      ) : null}
     </View>
   );
-};
-
-CustomForm.defaultProps = {
-  initialValues: {
-    title: "",
-    amount: "",
-    note: "",
-    date: "",
-  },
 };
 
 const styles = StyleSheet.create({
@@ -107,7 +150,8 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 5,
   },
-  button: { width: 130, left: 50 },
+  submit: { width: 130, left: 50, top: 20 },
+  cancel: { width: 130, left: 50, top: 30 },
 });
 
 export default CustomForm;
